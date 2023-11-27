@@ -1,0 +1,24 @@
+[
+    {
+        device_name:'acionna_12cv',
+        id: 2
+    },
+    {
+        device_name:'cacimba',
+        id:1,
+        pump:
+            {
+                
+            }
+    }
+]
+
+{
+    "dependencies": {
+      "node": "^18.7.0",
+      "nodejs": "^0.0.0",
+      "prompt-sync": "^4.2.0",
+      "ws": "^8.8.1"
+    }
+  }
+  

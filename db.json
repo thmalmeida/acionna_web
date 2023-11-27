@@ -1,0 +1,25 @@
+{
+	"device": [
+		{
+			"id": 1,
+			"timestamp: "
+			"pump": {
+				"pressure": 0,
+				"t2sd": 0
+			}
+		},
+		{
+			"id": 2,
+			"p": 0,
+			"pump": [{
+				"t2sd": 0
+			}],
+			"pipe": [{
+				"p": 0
+			}],
+			"timers": [{
+				"uptime": 0
+			}]
+		}],
+	"info": 0
+}

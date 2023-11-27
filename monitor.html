@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- <link rel="stylesheet" href="./assets/w3.css"> -->
+		<!-- <link rel="shortcut icon" href="./assets/favicon.ico" type="image/x-icon"> -->
+		<!-- https://developer.mozilla.org/en-US/docs/Web/CSS/white-space-->
+		<style>
+			:root {
+				--color_me: #55BBFF;
+				--color_ro: #FF6677;
+			}
+			body {background-color: rgb(0, 0, 0);}
+			input {background-color: rgb(0, 0, 0);}
+			input {color: white;}
+			input {border: 2px solid powderblue;}
+			pre {border: 2px solid powderblue;}
+			button {background-color: gray;}
+			button {color: white;}
+			button:focus {
+				outline: none;
+				box-shadow: none;
+			}
+			h1   {color: white;}
+			p    {color: chartreuse;}
+			label{color: white;}
+			label{font-size: small;}
+			pre {
+				display: block;
+				white-space: break-spaces;
+				font-family: 'Courier New', Courier, monospace;
+			}
+			object {
+				font-size: small;
+				color:red;
+				background-color: gray;
+				border: 2px solid powderblue;
+				font-family:Tahoma;
+				font-size:20;
+			}
+
+			/* #timer {
+				font-size: 20pt;
+				font-weight: 100;
+				color: rgb(24, 147, 149);
+				padding: 20px;
+				width: 200px;
+				color: rgb(251, 9, 9);
+			} */
+		</style>
+
+		<title>Motor control!</title>
+	</head>
+
+	<body>
+	<!-- WS address box -->
+	<label for="fname">addr:</label>
+	<input type="text" id="ws_address_box" name="ws_adress" value="ws://192.168.1.31:9000/ws"
+	style="width: 180px"><button id="connect">Connect</button>
+	<label id="status" style="font-weight: bold;">Status:</label><br>
+	
+	<!-- Message response box -->
+	<pre id="messages" style="width: 99%; margin-left: 1%; height: 280px; overflow: scroll"></pre>
+	
+	<!-- Command box -->
+	<input type="text" id="command_box" placeholder="place a command line" style="width: 80%; margin-left: 2%"></input>
+	<!--<input type="text" id="command_box" placeholder="place a command line" 
+	style="display: block; width: 80%; margin-bottom: 10px; margin-left: 5%; padding: 10px;"></input>-->
+	<button id="send" title="Send command" style="width:47px" >Send</button><br><br>
+	<!-- <button id="send" title="Send command" style="width: 10%; margin-left: 5%; height: 30px;">Send</button><br><br> -->
+
+	<!--        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>-->
+
+	<!-- Tab links -->
+	<!-- <div class="tab">
+	<ul class="nav nav-tabs">
+	<li class="active"><a data-toggle="tab" href="#clock">Clock</a></li>
+	<li> <a data-toggle="tab" href="sensors">Sensors</a></li>
+	<li> <a data-toggle="tab" href="motor">Motor</a></li>  
+	<li> <a data-toggle="tab" href="valves">Valves</a></li>        
+	<li> <a data-toggle="tab" href="config">Config</a></li>                
+	</ul>
+
+	<div class="tab-content">
+	<div id="clock" class="tab-pane fade in active">
+
+	</div>
+	<div id="sensors" class="tab-pane fade">
+	<h3>not implemented</h3>
+	<p>nothing implemented yed :/</p>
+	</div>
+	<div id="motor" class="tab-pane fade">
+
+	</div>
+	<div id="valves" class="tab-pane fade">
+	<h3>not implemented</h3>
+	<p>nothing implemented yed :/</p>
+	</div>
+	<div id="config" class="tab-pane fade">
+	<h3>not implemented</h3>
+	<p>nothing implemented yed :/</p>
+	</div>
+	</div>
+	</div> -->
+
+	<!-- Real time variables -->
+	<label for="fname">P1: </label>
+	<label id="rt_pressure1" style="font-family:courier; font-size:20pt;color:chocolate">___</label>
+	<label for="fname" style="font-family:courier; font-size:10pt;">m.c.a.  </label>
+	<label for="fname">P2: </label>
+	<label id="rt_pressure2" style="font-family:courier; font-size:20pt;color:blueviolet">___</label>
+	<label for="fname" style="font-family:courier; font-size:10pt;">m.c.a.  </label>
+	<label for="fname">t_on: </label><label id="rt_time_on" style="font-family:courier;
+	font-size:15pt;color:darkcyan">___</label>
+	<label for="fname">t_off: </label><label id="rt_time_off" style="font-family:courier;
+	font-size:15pt;color:darkcyan">___</label>
+	<label for="fname">K1: </label><label id="rt_k1" style="font-family:courier;
+	font-size:15pt;color:darkcyan">___</label>
+	<label for="fname">K2: </label><label id="rt_k2" style="font-family:courier;
+	font-size:15pt;color:darkcyan">___</label>
+	<label for="fname">K3: </label><label id="rt_k3" style="font-family:courier;
+	font-size:15pt;color:darkcyan">___</label>
+	<label for="fname">Rth: </label><label id="rt_rth" style="font-family:courier;
+	font-size:15pt;color:darkcyan">___</label>
+	<br><br>
+
+	<!-- System date time block -->
+	<label for="fname">System date time</label><br>
+	<button id="cmd_00">Horários/estado</button>
+	<button id="cmd_1h">Set time</button>
+	<button id="cmd_1d">Set date</button>
+	<button id="cmd_1h1d">Set datetime</button>
+	<button id="cmd_00x">auto refresh</button>
+	<label for="fname"> | </label>
+	<button id="cmd_61">Normal</button>
+	<button id="cmd_62">Irrigation</button>
+	<button id="cmd_63">Optimized</button>
+	<br><br>
+	
+	<!-- Motor timer -->
+	<label for="fname">Motor info</label><br>
+	<button id="cmd_01">lasts starts</button>
+	<button id="cmd_03">info</button>
+	<button id="cmd_02">timers</button>
+	<label for="fname">t2sd:</label><input type="number" id="motor_time_elapsed" style="width:30px" value="30">
+	<button id="cmd_02s">set</button><button id="cmd_02f">force</button>
+	<label for="fname"> | check K pins:</label>
+	<button id="cmd_70kt_1">No</button>
+	<button id="cmd_70kt_0">Yes</button>
+	<br><br>
+	
+	<!-- Auto turn -->
+	<label for="fname">Auto mode</label><br>
+	<button id="cmd_5">timer auto ask</button><button id="cmd_50s1">set auto on</button><button id="cmd_50s0">set auto off</button><br>
+	<label for="fname">time match num</label><input type="number" id="time_match_n" style="width:25px" value="1"><button id="cmd_5nx">set</button>
+	<!-- <label for="fname">time match index:</label>
+	<input type="number" id="time_match_index" style="width:30px" value="1"> -->
+	<label for="fname">time value:</label>
+	<input type="number" id="time_value" style="width:30px" value="70"><button id="cmd_5tx">set</button>
+	<input type="number" id="time_match_hour" style="width:30px" value="21">
+	<input type="number" id="time_match_min" style="width:30px" value="32"><button id="cmd_5hx">set</button>
+	<button id="cmd_5m1">m: k1</button><button id="cmd_5m2">m: k2</button><button id="cmd_5m6">m: Y-Delta</button>
+	<br><br>
+
+	<!-- Optimized mode -->
+	<label for="fname">Optimized mode</label><br>
+	<button id="cmd_51">Optimized ask</button><button id="cmd_51s1">set on</button><button id="cmd_51s0">set off</button>
+	<input type="number" id="optz_time_match_hour" style="width:30px" value="21">
+	<input type="number" id="optz_time_match_min" style="width:30px" value="32"><button id="cmd_51hxxxx">set</button>
+	<label for="fname">time delay</label><input type="number" id="optz_time_delay_min" style="width:30px" value="03"><button id="cmd_51dxx">set</button>
+	<label for="fname">event index</label><input type="number" id="optz_event_n" style="width:30px" value="1"><button id="cmd_51nx">set</button>
+	<label for="fname">num cycles</label><input type="number" id="optz_cycles_n" style="width:30px" value="1">
+	<label for="fname">t2sd</label><input type="number" id="optz_time_to_shutdown" style="width:30px" value="58">
+	<button id="cmd_51m1">m: k1</button><button id="cmd_51m2">m: k2</button>
+	<label for="fname">red time</label><input type="number" id="optz_time_red_hour" style="width:30px" value="05"><input type="number" id="optz_time_red_min" style="width:30px" value="59">
+	<button id="cmd_51rxxxx">set</button>
+	<br><br>
+
+	<!-- Motor actions -->
+	<label for="fname">Motor actions</label><br>
+	<button id="cmd_30">Desligar Motor</button>
+	<button id="cmd_31">Ligar K1</button>
+	<button id="cmd_32">Ligar K2</button>
+	<button id="cmd_33">Ligar K3</button>
+	<button id="cmd_34">to_delta</button>
+	<button id="cmd_35">to_Y</button>
+	<button id="cmd_36">Ligar Y_delta</button>
+	<br><br>
+
+	<!-- Valves configuration -->
+	<label for="fname">Valves: </label>
+	<button id="cmd_85">get</button>
+	<label for="fname">0x</label>
+	<input type="number" id="output_" style="width:45px" value="0000"><button id="cmd_84">put</button>
+	<button id="cmd_86i">Irms</button>
+	<button id="cmd_86d">I_data</button>
+	<button id="cmd_86p">I calc</button>
+	<button id="cmd_86t">temp</button>
+	<button id="cmd_86u">uptime</button>
+	<button id="cmd_86v">transfer test</button>
+	<button id="cmd_88">probe</button>
+	<button id="cmd_89">reset</button><br>
+	<button id="cmd_80">Valves ask</button>
+	<button id="cmd_80h">Lasts</button>
+	<button id="cmd_80s1" onclick="cmd_80s1()">Valves Start</button>
+	<button id="cmd_80s0" onclick="cmd_80s0()">Valves Stop</button>
+	<label for="fname">sentido: </label><button id="cmd_80d0">direto</button><button id="cmd_80d1">inverso</button><button id="cmd_80n">next</button><br>
+	<label for="fname">valve:</label><input type="number" id="valve_number" style="width:30px" value="1">
+	<button id="cmd_80vnn">info</button><button id="cmd_80vnni">add</button><button id="cmd_80vnnr">rmv</button>
+	<button id="cmd_80vnn1">on</button><button id="cmd_80vnn0">off</button>
+	<label for="fname">time:</label><input type="number" id="valve_time" style="width:30px" value="30"><button id="cmd_80vnnt">set</button>
+	<label for="fname">pressure:</label><input type="number" id="valve_pressure" style="width:30px" value="67"><button id="cmd_80vnnp">set</button>
+	<br><br>
+
+	<!-- Pressure configuration -->
+	<label for="fname">Pressure setup: <button id="cmd_07">fsm info</button></label><button id="cmd_70pl_1">press low enable</button></label><button id="cmd_70pl_0">press low disable</button></label><br>
+	<label for="fname">max pressure pipe1:</label><input type="number" id="pipe1_ph" style="width:30px" value="68">
+	<!-- <button id="cmd_03p1">set</button> -->
+	<button id="cmd_70ph">set</button>
+	<label for="fname"> | </label>
+	<button id="cmd_03s1">check</button>
+	<br>
+	<label for="fname">k1 on pipe1:</label>
+	<button id="cmd_70l1_1">Press low enable</button><button id="cmd_70l1_0">Press low disable</button><button id="cmd_70l1">Press low show</button><br><br>
+	<label for="fname">k2 on pipe2:</label>
+	<button id="cmd_70l2_1">Press low enable</button><button id="cmd_70l2_0">Press low disable</button><button id="cmd_70l2">Press low show</button><br><br>
+	<label for="fname">delta on pipe1:</label>
+	<button id="cmd_70l4_1">Press low enable</button><button id="cmd_70l4_0">Press low disable</button><button id="cmd_70l4">Press low show</button>
+	<br><br>
+
+	<!-- Wifi info -->
+	<label for="fname">Wi-Fi</label><br>
+	<button id="cmd_90_0">info</button>
+	<button id="cmd_90_1">scan</button>
+	<button id="cmd_90_2">mac</button>
+	<br><br>
+
+	<!-- Firmware update -->
+	<label for="fname">Firmware</label><br>
+	<button id="cmd_91">date</button>
+	<button id="cmd_95_0">info part</button>
+	<button id="cmd_95_1">info app</button>
+	<button id="cmd_95_2">info sha256</button>
+	<button id="cmd_95_3">mark invalid</button>
+	<button id="cmd_95_4">mark valid</button>
+	<button id="cmd_95_8">change boot</button>
+	<button id="cmd_95_9">update</button>
+	<br><br>
+	
+	<!-- System functions -->
+	<label for="fname">System</label><br>
+	<button id="cmd_97">RAM free</button>
+	<button id="cmd_98">reset reason</button>
+	<button id="cmd_99">Reboot</button>
+	<br><br>
+
+	<script>
+		// Control buttons
+		const btn_00 = document.querySelector('#cmd_00');
+		const btn_00x = document.querySelector('#cmd_00x');
+		const btn_01 = document.querySelector('#cmd_01');
+		const btn_02 = document.querySelector('#cmd_02');
+		const btn_02s = document.querySelector('#cmd_02s');
+		const btn_02f = document.querySelector('#cmd_02f');
+		const btn_03 = document.querySelector('#cmd_03');
+		const btn_03s1 = document.querySelector('#cmd_03s1');
+		const btn_07 = document.querySelector('#cmd_07');
+		const btn_30 = document.querySelector('#cmd_30');
+		const btn_31 = document.querySelector('#cmd_31');
+		const btn_32 = document.querySelector('#cmd_32');
+		const btn_33 = document.querySelector('#cmd_33');
+		const btn_34 = document.querySelector('#cmd_34');
+		const btn_35 = document.querySelector('#cmd_35');
+		const btn_36 = document.querySelector('#cmd_36');
+		const btn_1h = document.querySelector('#cmd_1h');
+		const btn_1d = document.querySelector('#cmd_1d');
+		const btn_1h1d = document.querySelector('#cmd_1h1d');
+		const btn_5  = document.querySelector("#cmd_5");
+		const btn_50s0 = document.querySelector("#cmd_50s0");
+		const btn_50s1 = document.querySelector("#cmd_50s1");
+		const btn_5nx = document.querySelector("#cmd_5nx");
+		const btn_5hx = document.querySelector("#cmd_5hx");
+		const btn_5tx = document.querySelector("#cmd_5tx");
+		const btn_5m1 = document.querySelector("#cmd_5m1");
+		const btn_5m2 = document.querySelector("#cmd_5m2");
+		const btn_5m6 = document.querySelector("#cmd_5m6");
+		const btn_51 = document.querySelector("#cmd_51");
+		const btn_51s0 = document.querySelector("#cmd_51s0");
+		const btn_51s1 = document.querySelector("#cmd_51s1");
+		const btn_51dxx = document.querySelector("#cmd_51dxx");
+		const btn_51nx = document.querySelector("#cmd_51nx");
+		const btn_51hxxxx = document.querySelector("#cmd_51hxxxx");
+		const btn_51m1 = document.querySelector("#cmd_51m1");
+		const btn_51m2 = document.querySelector("#cmd_51m2");
+		const btn_51rxxxx = document.querySelector("#cmd_51rxxxx");
+		const btn_61 = document.querySelector('#cmd_61');
+		const btn_62 = document.querySelector('#cmd_62');
+		const btn_63 = document.querySelector('#cmd_63');
+		const btn_7tm0 = document.querySelector("#cmd_7tm0");
+		const btn_70kt_0 = document.querySelector('#cmd_70kt_0');
+		const btn_70kt_1 = document.querySelector('#cmd_70kt_1');
+		const btn_70l1_1 = document.querySelector('#cmd_70l1_1');
+		const btn_70l1_0 = document.querySelector('#cmd_70l1_0');
+		const btn_70l1 = document.querySelector('#cmd_70l1');
+		const btn_70l2_1 = document.querySelector('#cmd_70l2_1');
+		const btn_70l2_0 = document.querySelector('#cmd_70l2_0');
+		const btn_70l2 = document.querySelector('#cmd_70l2');
+		const btn_70l4_1 = document.querySelector('#cmd_70l4_1');
+		const btn_70l4_0 = document.querySelector('#cmd_70l4_0');
+		const btn_70l4 = document.querySelector('#cmd_70l4');
+		const btn_70pl_1 = document.querySelector('#cmd_70pl_1');
+		const btn_70pl_0 = document.querySelector('#cmd_70pl_0');
+		const btn_70ph = document.querySelector('#cmd_70ph');
+		const btn_80 = document.querySelector('#cmd_80');
+		const btn_80s0 = document.querySelector('#cmd_80s0');
+		const btn_80s1 = document.querySelector('#cmd_80s1');		
+		const btn_80d0 = document.querySelector('#cmd_80d0');
+		const btn_80d1 = document.querySelector('#cmd_80d1');
+		const btn_80h = document.querySelector('#cmd_80h');
+		const btn_80n = document.querySelector('#cmd_80n');
+		const btn_80vnn = document.querySelector('#cmd_80vnn');
+		const btn_80vnn1 = document.querySelector('#cmd_80vnn1');
+		const btn_80vnn0 = document.querySelector('#cmd_80vnn0');
+		const btn_80vnni = document.querySelector('#cmd_80vnni');
+		const btn_80vnnr = document.querySelector('#cmd_80vnnr');
+		const btn_80vnnt = document.querySelector('#cmd_80vnnt');
+		const btn_80vnnp = document.querySelector('#cmd_80vnnp');
+		const btn_84 = document.querySelector('#cmd_84');
+		const btn_85 = document.querySelector('#cmd_85');
+		const btn_86d = document.querySelector('#cmd_86d');
+		const btn_86i = document.querySelector('#cmd_86i');
+		const btn_86p = document.querySelector('#cmd_86p');
+		const btn_86u = document.querySelector('#cmd_86u');
+		const btn_86t = document.querySelector('#cmd_86t');
+		const btn_86v = document.querySelector('#cmd_86v');
+		const btn_88 = document.querySelector('#cmd_88');
+		const btn_89 = document.querySelector('#cmd_89');
+		const btn_90_0 = document.querySelector('#cmd_90_0');
+		const btn_90_1 = document.querySelector('#cmd_90_1');
+		const btn_90_2 = document.querySelector('#cmd_90_2');
+		const btn_91 = document.querySelector('#cmd_91');
+		const btn_95_0 = document.querySelector("#cmd_95_0");
+		const btn_95_1 = document.querySelector("#cmd_95_1");
+		const btn_95_2 = document.querySelector("#cmd_95_2");
+		const btn_95_3 = document.querySelector("#cmd_95_3");
+		const btn_95_4 = document.querySelector("#cmd_95_4");
+		const btn_95_8 = document.querySelector("#cmd_95_8");
+		const btn_95_9 = document.querySelector("#cmd_95_9");
+		const btn_97 = document.querySelector("#cmd_97");
+		const btn_98 = document.querySelector("#cmd_98");
+		const btn_99 = document.querySelector("#cmd_99");
+
+		// var ws_address_box = document.getElementById("ws_address")
+		// var command_box_id = document.getElementById("command_box");
+		const ws_address_box = document.querySelector("#ws_address_box");
+		const command_box = document.querySelector('#command_box');
+		const btn_send = document.querySelector('#send');
+		const btn_connect = document.getElementById("connect");
+		const messages = document.querySelector('#messages');
+		const valve_number = document.querySelector('#valve_number');
+		const time_match_n = document.querySelector('#time_match_n');
+		// const time_match_index = document.querySelector('#time_match_index');
+		const time_match_hour = document.querySelector('#time_match_hour');
+		const time_match_min = document.querySelector('#time_match_min');
+		const valve_time = document.querySelector('#valve_time');
+		const valve_pressure = document.querySelector('#valve_pressure');
+		const motor_time_elapsed = document.querySelector("#motor_time_elapsed");
+
+		const optz_time_delay_min = document.querySelector("#optz_time_delay_min");
+		const optz_event_n = document.querySelector("#optz_event_n");
+		const optz_cycles_n = document.querySelector("#optz_cycles_n");
+		const optz_time_to_shutdown = document.querySelector("#optz_time_to_shutdown");
+		const optz_time_match_hour = document.querySelector("#optz_time_match_hour");
+		const optz_time_match_min = document.querySelector("#optz_time_match_min");
+		const optz_time_red_hour = document.querySelector("#optz_time_red_hour");
+		const optz_time_red_min = document.querySelector("#optz_time_red_min");
+
+		var ws_state;
+		var ws = null;
+		var command_str;
+		// var real_time_state;
+
+		var data_json;
+
+		// defines the console colors
+		const color_me = getComputedStyle(document.documentElement).getPropertyValue('--color_me');
+		const color_ro = getComputedStyle(document.documentElement).getPropertyValue('--color_ro');
+
+		// function to put any message into scroll box with some color
+		function message_to_box(msg, color)
+		{
+			document.querySelector('#messages').innerHTML += `\n<font color='${color}'>${msg}</font>`;
+			messages.scrollTop = messages.scrollHeight;
+		}
+
+		// put message int real time pressure box
+		// function message_to_box_rt(msg)
+		// {
+		// 	let str = String(msg) + "";
+		// 	document.getElementById('rt_pressure1').innerHTML = str;
+		// }
+
+		// convert seconds to seconds
+		timesec_to_sec = (seconds) => {
+			let sec = parseInt((seconds%3600)%60);
+			return (sec);
+		}
+		// convert seconds to minutes
+		timesec_to_min = (seconds) => {
+			let min = parseInt((seconds%3600)/60);
+			return min;
+		}
+		// convert seconds to hours
+		timesec_to_hour = (seconds) => {
+			return 	parseInt((seconds%(60*60*24))/3600);
+		}
+
+		// function to get json data and put into the dash board
+		message_to_dashboard = (msg) => {
+			document.getElementById('rt_pressure1').innerHTML = String(msg.p1);
+			document.getElementById('rt_pressure2').innerHTML = String(msg.p2);
+
+			let time_on = String(timesec_to_hour(msg.ton)).padStart(2,'0') + ":" + String(timesec_to_min(msg.ton)).padStart(2,'0') + ":" + String(timesec_to_sec(msg.ton)).padStart(2,'0');
+			let time_off = String(timesec_to_hour(msg.toff)).padStart(2,'0') + ":" + String(timesec_to_min(msg.toff)).padStart(2,'0') + ":" + String(timesec_to_sec(msg.toff)).padStart(2,'0');
+
+			document.getElementById('rt_time_on').innerHTML = time_on;
+			document.getElementById('rt_time_off').innerHTML = time_off;
+			document.getElementById('rt_k1').innerHTML = String(msg.k1);
+			document.getElementById('rt_k2').innerHTML = String(msg.k2);
+			document.getElementById('rt_k3').innerHTML = String(msg.k3);
+			document.getElementById('rt_rth').innerHTML = String(msg.rth);
+		}
+
+		// --- WebSocket functions ---
+		function ws_on_open() {
+			document.getElementById("status").innerHTML = "Connected!";
+			document.getElementById("connect").innerHTML = "Disconnect";
+			document.getElementById('status').style.color = "#00FF00";
+			document.querySelector('#send').disable = false;
+
+			ws_state = 1;
+
+			message_to_box(`Opened connection at ${get_datetime()}`, "white");
+			console.log("Connected to server " + ws_address_box.value);
+		}
+
+		function ws_on_close() {
+			document.getElementById("status").innerHTML = "Disconnected";
+			document.getElementById('status').style.color = 'red';
+			document.getElementById("connect").innerHTML = "Connect";
+			message_to_box(`Closed connection at ${get_datetime()}`, "white");
+			console.log("Disconnected to the server");
+
+			ws_state = 0;
+		}
+
+		// get system time		
+		get_datetime = () => {
+			let datetime = new Date();
+			return datetime;
+		}
+		// date time to string convert
+		function time_to_string (_datetime)
+		{
+			let str = String(_datetime.getHours()).padStart(2,'0') +
+			String(_datetime.getMinutes()).padStart(2,'0') +
+			String(_datetime.getSeconds()).padStart(2,'0');  
+			return str
+		}
+
+		date_to_string = (_datetime) => {
+			let str = String(_datetime.getDate()).padStart(2,'0') +
+			String(_datetime.getMonth()+1).padStart(2,'0') +
+			String(_datetime.getFullYear()).padStart(4,'0'); 
+			return str
+		}
+
+		// Send command_str by pressing ENTER key from command box
+		command_box.addEventListener("keypress", ev => {
+			if(ev.keyCode === 13) {
+				ev.preventDefault();
+				btn_send.click();
+				console.log("Enter pressed on command box");
+			}
+		});
+		
+		ws_address_box.addEventListener("keypress", ev => {
+			if(ev.keyCode === 13) {
+				ev.preventDefault();
+				btn_connect.click();
+				console.log("Enter pressed on addr box")
+			}
+		});
+
+		// websocket client connection
+		function connect(addr) {
+			ws = new WebSocket(addr);
+
+			ws.onopen = () => {
+				ws_on_open();
+			}
+
+			ws.onmessage = ev => {
+				// ws_on_message(ev);
+				try {
+					data_json = JSON.parse(ev.data);
+					// console.log(data_json);
+					message_to_dashboard(data_json);
+					// real_time_state = 1;
+					console.log(data_json);
+				}
+				catch(e) {
+					message_to_box(ev.data, color_ro);
+					console.log(e);
+				}
+			}
+
+			ws.onerror = error => {
+				// alert(`[Error] ${error.message}`);
+			}
+
+			ws.onclose = () => {
+				ws = null;
+				ws_on_close();
+				// console.log("on close event");
+			}
+		}
+
+		// Click function to connect button (event)
+		btn_connect.onclick = () => {
+			if(ws) {
+				if(ws.readyState === WebSocket.OPEN)    // Close the connection, if it's open.
+				{
+					ws.close();
+					console.log("disconnected!");
+					}
+				} else {
+					connect(ws_address_box.value);
+					document.getElementById("connect").innerHTML = "connecting...";
+				}
+		}
+		btn_send.onclick = function() {
+			// Click function to operation buttons
+			if((ws_state === 1) && (command_box.value != ""))
+			{
+				ws.send(command_box.value);
+				message_to_box(`ME: ${command_box.value}`, color_me);
+				command_box.value = '';                    // clear command box.
+			}
+		}
+		btn_00.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$00;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_01.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$01;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_00x.onclick = () =>	{
+			if(ws_state === 1)
+			{
+				command_str = "$00:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_02.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$02;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_02s.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$02:s:" + String(motor_time_elapsed.value).padStart(3,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_02f.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$02:f:" + String(motor_time_elapsed.value).padStart(3,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_03.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$03;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+
+				setTimeout( function () {
+				command_str = "$03:u;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 1000);
+			}
+		}
+		btn_03s1.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$03:s1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_07.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$07;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_1h.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$10:h:" + time_to_string(get_datetime()) + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_1d.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$10:d:" + date_to_string(get_datetime()) + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_1h1d.onclick = () => {
+			if(ws_state === 1)
+			{
+				setTimeout( function () {
+				command_str = "$10:h:" + time_to_string(get_datetime()) + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 1000);
+
+				command_str = "$10:d:" + date_to_string(get_datetime()) + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_30.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$30;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_31.onclick = () => {
+			if(ws_state === 1)
+			{
+				var command_str = "$31;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_32.onclick = () => {
+			if(ws_state === 1)
+			{
+				var command_str = "$32;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_33.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$33;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_34.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$34;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_35.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$35;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_36.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$36;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_5.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$50;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_50s0.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$50:s:0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_50s1.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$50:s:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_5nx.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$50:n:" + String(time_match_n.value).padStart(1,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_5m1.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$50:m" + String(time_match_n.value).padStart(1,'0') + ":1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_5m2.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$50:m" + String(time_match_n.value).padStart(1,'0') + ":2;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_5m6.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$50:m" + String(time_match_n.value).padStart(1,'0') + ":6;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_5hx.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$50:h" + String(time_match_n.value).padStart(1,'0') + ":" + String(time_match_hour.value).padStart(2,'0') + String(time_match_min.value).padStart(2,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_5tx.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$50:t" + String(time_match_n.value).padStart(1,'0') + ":" + String(time_value.value).padStart(3,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}			
+		}
+		btn_51.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$51;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_51s0.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$51:s:0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_51s1.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$51:s:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_51dxx.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$51:d:" + String(optz_time_delay_min.value).padStart(2,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_51hxxxx.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$51:h:" + String(optz_time_match_hour.value).padStart(2,'0') + String(optz_time_match_min.value).padStart(2,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_51nx.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$51:n:" + String(optz_event_n.value).padStart(1,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}	
+		btn_51m1.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$51:e" + String(optz_event_n.value).padStart(1,'0') + ":m1:" + String(optz_cycles_n.value).padStart(1,'0') + ":" + String(optz_time_to_shutdown.value).padStart(3,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_51m2.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$51:e" + String(optz_event_n.value).padStart(1,'0') + ":m2:" + String(optz_cycles_n.value).padStart(1,'0') + ":" + String(optz_time_to_shutdown.value).padStart(3,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_51rxxxx.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$51:r:" + String(optz_time_red_hour.value).padStart(2,'0') + String(optz_time_red_min.value).padStart(2,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_61.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$61;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_62.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$62;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_63.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$63;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70kt_0.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:kt:0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70kt_1.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:kt:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70pl_1.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:pl:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70pl_0.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:pl:0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70l1_1.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:l1:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70l1_0.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:l1:0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70l1.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:l1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70l2_1.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:l2:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70l2_0.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:l2:0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70l2.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:l2;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70l4_1.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:l4:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70l4_0.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:l4:0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70l4.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:l4;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70ph.onclick = () =>
+		{
+			if(ws_state === 1)
+			{
+				command_str = "$70:ph:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+
+				setTimeout( function () {
+				command_str = "$03:s1:" + String(pipe1_ph.value).padStart(2,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 1000);
+			}
+		}
+		btn_80.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$80;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		cmd_80s1 = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$80:s:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		function cmd_80s0() {
+			if(ws_state === 1)
+			{
+				command_str = "$80:s:0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80d0.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$80:d:0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80d1.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$80:d:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80h.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$80:h;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80n.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$80:n;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80vnn.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80vnn1.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80vnn0.onclick = () => {
+		if(ws_state === 1)
+			{
+				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80vnni.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":i;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80vnnr.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":r;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80vnnt.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":t:" + String(valve_time.value).padStart(3,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80vnnp.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":p:" + String(valve_pressure.value).padStart(2,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_84.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$84:" + String(output_.value).padStart(2,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_85.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$85;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_86d.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$86:d;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_86i.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$86:i;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_86p.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$86:p;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_86t.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$86:t;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_86v.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$86:v;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_86u.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$86:u;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_88.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$88;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_89.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$89;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_90_0.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$90:0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_90_1.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$90:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_90_2.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$90:2;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_91.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$91;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_95_0.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$95:0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_95_1.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$95:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_95_2.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$95:2;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_95_3.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$95:3;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_95_4.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$95:4;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_95_8.onclick = () => {
+		if(ws_state === 1)
+		{
+			command_str = "$95:8;";
+			ws.send(command_str);
+			message_to_box(`ME: ${command_str}`, color_me);
+			console.log(command_str);
+		}
+	}
+		btn_95_9.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$95:9;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_97.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$97;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_98.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$98;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_99.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$99;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+
+		console.log("Address value: " + ws_address_box.value);            
+	</script>
+</body>
+</html>
