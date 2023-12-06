@@ -252,8 +252,11 @@
 	
 	<!-- System functions -->
 	<label for="fname">System</label><br>
-	<button id="cmd_97">RAM free</button>
-	<button id="cmd_98">reset reason</button>
+	<button id="cmd_96b">reset reason</button>
+	<button id="cmd_96c">Chip info</button>
+	<button id="cmd_96m">RAM free</button>
+	<button id="cmd_96t">Ticks</button>
+
 	<button id="cmd_99">Reboot</button>
 	<br><br>
 
@@ -349,8 +352,10 @@
 		const btn_95_4 = document.querySelector("#cmd_95_4");
 		const btn_95_8 = document.querySelector("#cmd_95_8");
 		const btn_95_9 = document.querySelector("#cmd_95_9");
-		const btn_97 = document.querySelector("#cmd_97");
-		const btn_98 = document.querySelector("#cmd_98");
+		const btn_96b = document.querySelector("#cmd_96b");
+		const btn_96c = document.querySelector("#cmd_96c");
+		const btn_96m = document.querySelector("#cmd_96m");
+		const btn_96t = document.querySelector("#cmd_96t");
 		const btn_99 = document.querySelector("#cmd_99");
 
 		// var ws_address_box = document.getElementById("ws_address")
@@ -1397,19 +1402,46 @@
 				console.log(command_str);
 			}
 		}
-		btn_97.onclick = () => {
+		btn_96b.onclick = () => {
 			if(ws_state === 1)
 			{
-				command_str = "$97;";
+				command_str = "$96:b;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_98.onclick = () => {
+		btn_96c.onclick = () => {
 			if(ws_state === 1)
 			{
-				command_str = "$98;";
+				command_str = "$96:c;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_96m.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$96:m;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_96t.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$96:t;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_96t.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$96:t;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
