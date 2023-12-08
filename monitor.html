@@ -216,19 +216,19 @@
 	<br><br>
 
 	<!-- Pressure configuration -->
-	<label for="fname">Pressure setup: <button id="cmd_07">fsm info</button></label><button id="cmd_70pl_1">press low enable</button></label><button id="cmd_70pl_0">press low disable</button></label><br>
-	<label for="fname">max pressure pipe1:</label><input type="number" id="pipe1_ph" style="width:30px" value="68">
-	<!-- <button id="cmd_03p1">set</button> -->
-	<button id="cmd_70ph">set</button>
-	<label for="fname"> | </label>
-	<button id="cmd_03s1">check</button>
+	<label for="fname">Max pressure pipe1:</label><input type="number" id="pipe1_ph" style="width:30px" value="68">
+	<button id="cmd_70ph">set</button><label for="fname"> | </label><button id="cmd_03s1">show</button>
 	<br>
+	<label for="fname">Pressure low:</label><button id="cmd_70pl_1">enable</button></label><button id="cmd_70pl_0">disable</button>
+	<label for="fname"> | </label></label><button id="cmd_70pl">show</button></label><button id="cmd_07">fsm info</button></label><br>
 	<label for="fname">k1 on pipe1:</label>
-	<button id="cmd_70l1_1">Press low enable</button><button id="cmd_70l1_0">Press low disable</button><button id="cmd_70l1">Press low show</button><br><br>
+	<button id="cmd_70l1_1">enable</button><button id="cmd_70l1_0">disable</button><label for="fname"> | </label><button id="cmd_70l1">show</button>
+	<br>	
 	<label for="fname">k2 on pipe2:</label>
-	<button id="cmd_70l2_1">Press low enable</button><button id="cmd_70l2_0">Press low disable</button><button id="cmd_70l2">Press low show</button><br><br>
+	<button id="cmd_70l2_1">enable</button><button id="cmd_70l2_0">disable</button><label for="fname"> | </label><button id="cmd_70l2">show</button>
+	<br>
 	<label for="fname">delta on pipe1:</label>
-	<button id="cmd_70l4_1">Press low enable</button><button id="cmd_70l4_0">Press low disable</button><button id="cmd_70l4">Press low show</button>
+	<button id="cmd_70l4_1">enable</button><button id="cmd_70l4_0">disable</button><label for="fname"> | </label><button id="cmd_70l4">show</button>
 	<br><br>
 
 	<!-- Wifi info -->
@@ -314,6 +314,7 @@
 		const btn_70l4_1 = document.querySelector('#cmd_70l4_1');
 		const btn_70l4_0 = document.querySelector('#cmd_70l4_0');
 		const btn_70l4 = document.querySelector('#cmd_70l4');
+		const btn_70pl = document.querySelector('#cmd_70pl');
 		const btn_70pl_1 = document.querySelector('#cmd_70pl_1');
 		const btn_70pl_0 = document.querySelector('#cmd_70pl_0');
 		const btn_70ph = document.querySelector('#cmd_70ph');
@@ -930,60 +931,56 @@
 				console.log(command_str);
 			}
 		}
-		btn_70kt_0.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70kt_0.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:kt:0;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_70kt_1.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70kt_1.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:kt:1;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_70pl_1.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
-				command_str = "$70:pl:1;";
+		btn_70pl.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$70:pl;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_70pl_0.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70pl_0.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:pl:0;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_70l1_1.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70pl_1.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$70:pl:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_70l1_1.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:l1:1;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_70l1_0.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70l1_0.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:l1:0;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
