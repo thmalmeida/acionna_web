@@ -153,7 +153,7 @@
 	<br><br>
 	
 	<!-- Auto turn -->
-	<label for="fname">Auto mode</label><br>
+	<label for="fname">Auto mode (Normal and Irrigation modes only)</label><br>
 	<button id="cmd_5">timer auto ask</button><button id="cmd_50s1">set auto on</button><button id="cmd_50s0">set auto off</button><br>
 	<label for="fname">time match num</label><input type="number" id="time_match_n" style="width:25px" value="1"><button id="cmd_5nx">set</button>
 	<!-- <label for="fname">time match index:</label>
@@ -191,7 +191,7 @@
 	<br><br>
 
 	<!-- Valves configuration -->
-	<label for="fname">Valves: </label>
+	<label for="fname">Valves Configuration</label><br>
 	<button id="cmd_85">get</button>
 	<label for="fname">0x</label>
 	<input type="number" id="output_" style="width:45px" value="0000"><button id="cmd_84">put</button>
@@ -213,9 +213,11 @@
 	<button id="cmd_80vnn1">on</button><button id="cmd_80vnn0">off</button>
 	<label for="fname">time:</label><input type="number" id="valve_time" style="width:30px" value="30"><button id="cmd_80vnnt">set</button>
 	<label for="fname">pressure:</label><input type="number" id="valve_pressure" style="width:30px" value="67"><button id="cmd_80vnnp">set</button>
+	<label for="fname">rain mm:</label><input type="number" id="rain_mm" style="width:38px" value="005"><button id="cmd_80vnnurr">set</button>
 	<br><br>
 
 	<!-- Pressure configuration -->
+	<label for="fname">Pressure sensor configuration</label><br>
 	<label for="fname">Max pressure pipe1:</label><input type="number" id="pipe1_ph" style="width:30px" value="68">
 	<button id="cmd_70ph">set</button><label for="fname"> | </label><button id="cmd_03s1">show</button>
 	<br>
@@ -332,6 +334,7 @@
 		const btn_80vnnr = document.querySelector('#cmd_80vnnr');
 		const btn_80vnnt = document.querySelector('#cmd_80vnnt');
 		const btn_80vnnp = document.querySelector('#cmd_80vnnp');
+		const btn_80vnnurr = document.querySelector('#cmd_80vnnurr');
 		const btn_84 = document.querySelector('#cmd_84');
 		const btn_85 = document.querySelector('#cmd_85');
 		const btn_86d = document.querySelector('#cmd_86d');
@@ -374,6 +377,8 @@
 		const valve_time = document.querySelector('#valve_time');
 		const valve_pressure = document.querySelector('#valve_pressure');
 		const motor_time_elapsed = document.querySelector("#motor_time_elapsed");
+
+		const rain_mm = document.querySelector('#rain_mm');
 
 		const optz_time_delay_min = document.querySelector("#optz_time_delay_min");
 		const optz_event_n = document.querySelector("#optz_event_n");
@@ -1195,6 +1200,15 @@
 			if(ws_state === 1)
 			{
 				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":p:" + String(valve_pressure.value).padStart(2,'0') + ";";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80vnnurr.onclick = () => {
+			if(ws_state === 1)
+			{
+				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":u:" + String(rain_mm.value).padStart(3,'0') + ";";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
