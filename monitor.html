@@ -1,3 +1,11 @@
+<!-- To build a new functionality need to follow 3 steps
+Step 1: 
+
+Step 2:
+
+Step 3:
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -56,7 +64,7 @@
 	<body>
 	<!-- WS address box -->
 	<label for="fname">addr:</label>
-	<input type="text" id="ws_address_box" name="ws_adress" value="ws://192.168.1.31:9000/ws"
+	<input type="text" id="ws_address_box" name="ws_adress" value="ws://thmalmeida.us.to:49003/ws"
 	style="width: 180px"><button id="connect">Connect</button>
 	<label id="status" style="font-weight: bold;">Status:</label><br>
 	
@@ -126,6 +134,8 @@
 	<label for="fname">Rth: </label><label id="rt_rth" style="font-family:courier;
 	font-size:15pt;color:darkcyan">___</label>
 	<br><br>
+
+	<!-- Step 1: choose the origin of functionality and add label, field and buttons -->
 
 	<!-- System date time block -->
 	<label for="fname">System date time</label><br>
@@ -208,6 +218,8 @@
 	<button id="cmd_80s1" onclick="cmd_80s1()">Valves Start</button>
 	<button id="cmd_80s0" onclick="cmd_80s0()">Valves Stop</button>
 	<label for="fname">sentido: </label><button id="cmd_80d0">direto</button><button id="cmd_80d1">inverso</button><button id="cmd_80n">next</button><br>
+	<label for="fname">Delay switch: </label><button id="cmd_80f1">enable</button><button id="cmd_80f0">disable</button><button id="cmd_80f">show</button>
+	<input type="number" id="valve_switch_delay_time" style="width:30px" value="15"><button id="cmd_80gtt">set</button><br>
 	<label for="fname">valve:</label><input type="number" id="valve_number" style="width:30px" value="1">
 	<button id="cmd_80vnn">info</button><button id="cmd_80vnni">add</button><button id="cmd_80vnnr">rmv</button>
 	<button id="cmd_80vnn1">on</button><button id="cmd_80vnn0">off</button>
@@ -263,6 +275,9 @@
 	<br><br>
 
 	<script>
+
+		// Step 2: Create the button object bring information from html part, or bring some value from field em put into a javascript variable
+
 		// Control buttons
 		const btn_00 = document.querySelector('#cmd_00');
 		const btn_00x = document.querySelector('#cmd_00x');
@@ -321,8 +336,12 @@
 		const btn_70pl_0 = document.querySelector('#cmd_70pl_0');
 		const btn_70ph = document.querySelector('#cmd_70ph');
 		const btn_80 = document.querySelector('#cmd_80');
+		const btn_80f = document.querySelector('#cmd_80f');
+		const btn_80f0 = document.querySelector('#cmd_80f0');
+		const btn_80f1 = document.querySelector('#cmd_80f1');
+		const btn_80gtt = document.querySelector('#cmd_80gtt');
 		const btn_80s0 = document.querySelector('#cmd_80s0');
-		const btn_80s1 = document.querySelector('#cmd_80s1');		
+		const btn_80s1 = document.querySelector('#cmd_80s1');
 		const btn_80d0 = document.querySelector('#cmd_80d0');
 		const btn_80d1 = document.querySelector('#cmd_80d1');
 		const btn_80h = document.querySelector('#cmd_80h');
@@ -369,17 +388,23 @@
 		const btn_send = document.querySelector('#send');
 		const btn_connect = document.getElementById("connect");
 		const messages = document.querySelector('#messages');
-		const valve_number = document.querySelector('#valve_number');
-		const time_match_n = document.querySelector('#time_match_n');
+
+
+		// objects to store values of fields from HTML part
+		const motor_time_elapsed = document.querySelector("#motor_time_elapsed");
 		// const time_match_index = document.querySelector('#time_match_index');
+		const time_match_n = document.querySelector('#time_match_n');
 		const time_match_hour = document.querySelector('#time_match_hour');
 		const time_match_min = document.querySelector('#time_match_min');
+
+		// Irrigation variables
+		const valve_number = document.querySelector('#valve_number');
 		const valve_time = document.querySelector('#valve_time');
 		const valve_pressure = document.querySelector('#valve_pressure');
-		const motor_time_elapsed = document.querySelector("#motor_time_elapsed");
-
 		const rain_mm = document.querySelector('#rain_mm');
+		const valve_switch_delay_time = document.querySelector('#valve_switch_delay_time');
 
+		// Optimized object variables
 		const optz_time_delay_min = document.querySelector("#optz_time_delay_min");
 		const optz_event_n = document.querySelector("#optz_event_n");
 		const optz_cycles_n = document.querySelector("#optz_cycles_n");
@@ -540,6 +565,8 @@
 			}
 		}
 
+		// Step 3: give functionalyties to object buttons
+		
 		// Click function to connect button (event)
 		btn_connect.onclick = () => {
 			if(ws) {
@@ -1083,6 +1110,46 @@
 			if(ws_state === 1)
 				{
 				command_str = "$80;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80f.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$80:f;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80f0.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$80:f:0;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80f1.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$80:f:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+			}
+		}
+		btn_80gtt.onclick = () =>
+		{
+			if(ws_state === 1)
+				{
+				command_str = "$80:g:" + String(valve_switch_delay_time.value).padStart(2,'0') + ";";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
