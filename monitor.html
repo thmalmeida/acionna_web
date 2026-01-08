@@ -138,7 +138,6 @@ Step 3:
 	<br><br>
 
 	<!-- Step 1: choose the origin of functionality and add label, field and buttons -->
-
 	<!-- System date time block -->
 	<label for="fname">System date time</label><br>
 	<button id="cmd_00">Horários/estado</button>
@@ -153,11 +152,6 @@ Step 3:
 	<button id="cmd_63">Optimized</button>
 	<br><br>
 
-	<!-- Auto-set -->
-	<label for="fname">Auto set pre configured</label><br>
-	<button id="cmd_s01">cacimba01</button>
-	<br><br>
-	
 	<!-- Motor timer -->
 	<label for="fname">Motor info</label><br>
 	<button id="cmd_01">lasts starts</button>
@@ -253,6 +247,13 @@ Step 3:
 	<button id="cmd_70l4_1">enable</button><button id="cmd_70l4_0">disable</button><label for="fname"> | </label><button id="cmd_70l4">show</button>
 	<br><br>
 
+	<!-- Auto-set -->
+	<label for="fname">Auto set pre configured</label><br>
+	<button id="cmd_s01">cacimba_01</button>
+	<button id="cmd_s02">cacimba_02</button>
+	<button id="cmd_s03">Irrigação_01</button>
+	<br><br>
+
 	<!-- Wifi info -->
 	<label for="fname">Wi-Fi</label><br>
 	<button id="cmd_90_0">info</button>
@@ -287,7 +288,13 @@ Step 3:
 		// Step 2: Create the button object bring information from html part, or bring some value from field em put into a javascript variable
 
 		// group of commands for pre set
-		const btn_s01 = cmd_s01 = document.querySelector("#cmd_s01");
+		// const btn_s01 = cmd_s01 = document.querySelector("#cmd_s01");
+		// const btn_s02 = cmd_s02 = document.querySelector("#cmd_s02");
+		// const btn_s03 = cmd_s03 = document.querySelector("#cmd_s03");
+
+		const btn_s01 = document.querySelector("#cmd_s01");
+		const btn_s02 = document.querySelector("#cmd_s02");
+		const btn_s03 = document.querySelector("#cmd_s03");
 
 		// Control buttons
 		const btn_00 = document.querySelector('#cmd_00');
@@ -512,8 +519,7 @@ Step 3:
 			return datetime;
 		}
 		// date time to string convert
-		function time_to_string (_datetime)
-		{
+		function time_to_string (_datetime) {
 			let str = String(_datetime.getHours()).padStart(2,'0') +
 			String(_datetime.getMinutes()).padStart(2,'0') +
 			String(_datetime.getSeconds()).padStart(2,'0');  
@@ -622,13 +628,13 @@ Step 3:
 				console.log(command_str);}, 400);
 
 				setTimeout( function () {
-				command_str = "$03:s1:55";
+				command_str = "$03:s1:55;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);}, 600);
 
 				setTimeout( function () {
-				command_str = "$03:p1:100;";
+				command_str = "$03:p2:220;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);}, 800);
@@ -676,7 +682,7 @@ Step 3:
 				console.log(command_str);}, 2000);
 
 				setTimeout( function () {
-				command_str = "$51:r:0602;"
+				command_str = "$51:r:0603;"
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);}, 2200);
@@ -699,7 +705,145 @@ Step 3:
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);}, 2800);
 			}
+		}
+		btn_s02.onclick = () => {
+			if(ws_state === 1) {
+				// Set normal mode operation
+				command_str = "$61;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
 
+				// set pressure to 100 psi mode;
+				setTimeout( function () {
+				command_str = "$03:p1:100;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 200);
+
+				// pressure high protection
+				setTimeout( function () {
+				command_str = "$70:ph:1;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 400);
+
+				// max pressure to turn motor off is 53 m.c.a.
+				setTimeout( function () {
+				command_str = "$03:s1:53;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 600);
+
+				// 
+				setTimeout( function () {
+				command_str = "$03:p2:220;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 800);
+
+				// Enable low pressure check;
+				setTimeout( function () {
+				command_str = "$70:l2:1;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 1000);
+
+				// Enable auto mode
+				setTimeout( function () {
+				command_str = "$50:s:1;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 1200);
+
+				setTimeout( function () {
+				command_str = "$50:h:2135;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 1400);
+
+				setTimeout( function () {
+				command_str = "$50:t1:180;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 1600);
+				
+				setTimeout( function () {
+				command_str = "$50:m1:1;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 1800);
+
+				setTimeout( function () {
+				command_str = "$70:pl:1;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 2400);
+
+				// Set time using NTP
+				setTimeout( function () {
+				command_str = "$10:n;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 2800);
+
+				// Set auto refresh mode
+				setTimeout( function () {
+				command_str = "$00:1;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 2600);
+			}
+		}
+		btn_s03.onclick = () => {
+			if(ws_state === 1) {
+				command_str = "$62;";
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);
+
+				setTimeout( function () {
+				command_str = "$03:p1:162;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 200);
+
+				setTimeout( function () {
+				command_str = "$03:s1:68;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 400);
+
+				setTimeout( function () {
+				command_str = "$70:ph:1;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 600);
+
+				setTimeout( function () {
+				command_str = "$70:pl:1;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 600);
+
+				setTimeout( function () {
+				command_str = "$70:l4:1;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 800);
+
+				setTimeout( function () {
+				command_str = "$00:1;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 1000);
+
+				setTimeout( function () {
+				command_str = "$10:n;"
+				ws.send(command_str);
+				message_to_box(`ME: ${command_str}`, color_me);
+				console.log(command_str);}, 1200);
+			}
 		}
 
 		btn_00.onclick = () => {
@@ -877,8 +1021,7 @@ Step 3:
 				console.log(command_str);
 			}
 		}
-		btn_36.onclick = () =>
-		{
+		btn_36.onclick = () => {
 			if(ws_state === 1)
 			{
 				command_str = "$36;";
@@ -887,8 +1030,7 @@ Step 3:
 				console.log(command_str);
 			}
 		}
-		btn_5.onclick = () =>
-		{
+		btn_5.onclick = () => {
 			if(ws_state === 1)
 			{
 				command_str = "$50;";
@@ -897,8 +1039,7 @@ Step 3:
 				console.log(command_str);
 			}
 		}
-		btn_50s0.onclick = () =>
-		{
+		btn_50s0.onclick = () => {
 			if(ws_state === 1)
 			{
 				command_str = "$50:s:0;";
@@ -925,8 +1066,7 @@ Step 3:
 				console.log(command_str);
 			}
 		}
-		btn_5m1.onclick = () =>
-		{
+		btn_5m1.onclick = () => {
 			if(ws_state === 1)
 			{
 				command_str = "$50:m" + String(time_match_n.value).padStart(1,'0') + ":1;";
@@ -935,8 +1075,7 @@ Step 3:
 				console.log(command_str);
 			}
 		}
-		btn_5m2.onclick = () =>
-		{
+		btn_5m2.onclick = () => {
 			if(ws_state === 1)
 			{
 				command_str = "$50:m" + String(time_match_n.value).padStart(1,'0') + ":2;";
@@ -945,8 +1084,7 @@ Step 3:
 				console.log(command_str);
 			}
 		}
-		btn_5m6.onclick = () =>
-		{
+		btn_5m6.onclick = () => {
 			if(ws_state === 1)
 			{
 				command_str = "$50:m" + String(time_match_n.value).padStart(1,'0') + ":6;";
@@ -955,8 +1093,7 @@ Step 3:
 				console.log(command_str);
 			}
 		}
-		btn_5hx.onclick = () =>
-		{
+		btn_5hx.onclick = () => {
 			if(ws_state === 1)
 			{
 				command_str = "$50:h" + String(time_match_n.value).padStart(1,'0') + ":" + String(time_match_hour.value).padStart(2,'0') + String(time_match_min.value).padStart(2,'0') + ";";
@@ -965,8 +1102,7 @@ Step 3:
 				console.log(command_str);
 			}
 		}
-		btn_5tx.onclick = () =>
-		{
+		btn_5tx.onclick = () => {
 			if(ws_state === 1)
 			{
 				command_str = "$50:t" + String(time_match_n.value).padStart(1,'0') + ":" + String(time_value.value).padStart(3,'0') + ";";
@@ -983,20 +1119,16 @@ Step 3:
 				console.log(command_str);
 			}
 		}
-		btn_51s0.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_51s0.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$51:s:0;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_51s1.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_51s1.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$51:s:1;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1131,80 +1263,64 @@ Step 3:
 				console.log(command_str);
 			}
 		}
-		btn_70l1.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70l1.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:l1;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_70l2_1.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70l2_1.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:l2:1;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_70l2_0.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70l2_0.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:l2:0;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_70l2.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70l2.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:l2;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_70l4_1.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70l4_1.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:l4:1;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_70l4_0.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70l4_0.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:l4:0;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_70l4.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70l4.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:l4;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_70ph.onclick = () =>
-		{
-			if(ws_state === 1)
-			{
+		btn_70ph.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$70:ph:1;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1217,50 +1333,40 @@ Step 3:
 				console.log(command_str);}, 1000);
 			}
 		}
-		btn_80.onclick = () =>
-		{
-			if(ws_state === 1)
-				{
+		btn_80.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$80;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_80f.onclick = () =>
-		{
-			if(ws_state === 1)
-				{
+		btn_80f.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$80:f;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_80f0.onclick = () =>
-		{
-			if(ws_state === 1)
-				{
+		btn_80f0.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$80:f:0;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_80f1.onclick = () =>
-		{
-			if(ws_state === 1)
-				{
+		btn_80f1.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$80:f:1;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
 				console.log(command_str);
 			}
 		}
-		btn_80gtt.onclick = () =>
-		{
-			if(ws_state === 1)
-				{
+		btn_80gtt.onclick = () => {
+			if(ws_state === 1) {
 				command_str = "$80:g:" + String(valve_switch_delay_time.value).padStart(2,'0') + ";";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1268,8 +1374,7 @@ Step 3:
 			}
 		}
 		cmd_80s1 = () => {
-			if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:s:1;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1277,8 +1382,7 @@ Step 3:
 			}
 		}
 		function cmd_80s0() {
-			if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:s:0;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1286,8 +1390,7 @@ Step 3:
 			}
 		}
 		btn_80d0.onclick = () => {
-			if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:d:0;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1295,8 +1398,7 @@ Step 3:
 			}
 		}
 		btn_80d1.onclick = () => {
-			if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:d:1;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1304,8 +1406,7 @@ Step 3:
 			}
 		}
 		btn_80h.onclick = () => {
-			if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:h;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1313,8 +1414,7 @@ Step 3:
 			}
 		}
 		btn_80n.onclick = () => {
-			if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:n;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1322,8 +1422,7 @@ Step 3:
 			}
 		}
 		btn_80vnn.onclick = () => {
-			if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ";";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1331,8 +1430,7 @@ Step 3:
 			}
 		}
 		btn_80vnn1.onclick = () => {
-			if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":1;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1340,8 +1438,7 @@ Step 3:
 			}
 		}
 		btn_80vnn0.onclick = () => {
-		if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":0;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1349,8 +1446,7 @@ Step 3:
 			}
 		}
 		btn_80vnni.onclick = () => {
-			if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":i;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1358,8 +1454,7 @@ Step 3:
 			}
 		}
 		btn_80vnnr.onclick = () => {
-			if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":r;";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1367,8 +1462,7 @@ Step 3:
 			}
 		}
 		btn_80vnnt.onclick = () => {
-			if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":t:" + String(valve_time.value).padStart(3,'0') + ";";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
@@ -1376,8 +1470,7 @@ Step 3:
 			}
 		}
 		btn_80vnnp.onclick = () => {
-			if(ws_state === 1)
-			{
+			if(ws_state === 1) {
 				command_str = "$80:v:" + String(valve_number.value).padStart(2,'0') + ":p:" + String(valve_pressure.value).padStart(2,'0') + ";";
 				ws.send(command_str);
 				message_to_box(`ME: ${command_str}`, color_me);
